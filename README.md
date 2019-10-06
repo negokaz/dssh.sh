@@ -1,5 +1,7 @@
 # dssh.sh
 
+[![Build Status](https://travis-ci.org/negokaz/dssh.sh.svg?branch=master)](https://travis-ci.org/negokaz/dssh.sh)
+
 ssh client script for distributed systems
 
 ![](docs/img/ping.gif)
