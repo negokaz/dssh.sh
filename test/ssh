@@ -1,0 +1,17 @@
+#!/bin/bash
+# ssh stub script
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+        *@* )
+            shift 1
+            break
+            ;;
+        * )
+            shift 1
+            ;;
+    esac
+done
+
+bash -c "$@"
