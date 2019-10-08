@@ -186,9 +186,9 @@ function parse_arguments {
 temp_dir="$(mktemp -d)"
 
 function on_exit {
+    # kill all child processes
+    /usr/bin/env kill -PIPE -- -$$
     rm -rf "${temp_dir}"
-    # kill child processes
-    kill -- -$$ &> /dev/null
 }
 
 trap 'on_exit' EXIT
@@ -201,58 +201,55 @@ function execute_on_sshs {
     fi
 
     # execute command via ssh
-    # combine commands into one command with "{}" to kill it easiliy
-    {
-        echo "${ssh_dests}" | awk '{ print (NR % 6) + 1, $0 }' | xargs -I %COLOR_AND_DEST% -P ${parallelism} \
-        env \
-            pipe_is_enabled="${pipe_is_enabled}" \
-            label_is_enabled="${label_is_enabled}" \
-            color_and_dest="%COLOR_AND_DEST%" \
-            temp_dir="${temp_dir}" \
-            output_dir="${output_dir}" \
-            output_name="${output_name}" \
-            silent="${silent}" \
-            ssh_options="${ssh_options}" \
-            ssh_command="${command}" \
-        bash -c '
-            color_and_dest=(${color_and_dest})
-            color="${color_and_dest[0]}"
-            dest="${color_and_dest[1]}"
-            if ${pipe_is_enabled}
-            then
-                input="${temp_dir}/${dest}.stdin"
-            else
-                input=/dev/null
-            fi
-            if [ -z "${output_dir}" ]
-            then
-                output_file=/dev/null
-            else
-                mkdir -p    "${output_dir}/${dest}"
-                output_file="${output_dir}/${dest}/${output_name}"
-            fi
-            if ${silent}
-            then
-                stdout=/dev/null
-                stderr=/dev/null
-            else
-                stdout=/dev/stdout
-                stderr=/dev/stderr
-            fi
-            if ${label_is_enabled}
-            then
-                stdout_label="\033[3${color}m${dest}\t|\033[0m "
-                stderr_label="\033[3${color}m${dest}\t\033[31m!\033[0m "
-            else
-                stdout_label=''
-                stderr_label=''
-            fi
+    echo "${ssh_dests}" | awk '{ print (NR % 6) + 1, $0 }' | xargs -I %COLOR_AND_DEST% -P ${parallelism} \
+    env \
+        pipe_is_enabled="${pipe_is_enabled}" \
+        label_is_enabled="${label_is_enabled}" \
+        color_and_dest="%COLOR_AND_DEST%" \
+        temp_dir="${temp_dir}" \
+        output_dir="${output_dir}" \
+        output_name="${output_name}" \
+        silent="${silent}" \
+        ssh_options="${ssh_options}" \
+        ssh_command="${command}" \
+    bash -c '
+        color_and_dest=(${color_and_dest})
+        color="${color_and_dest[0]}"
+        dest="${color_and_dest[1]}"
+        if ${pipe_is_enabled}
+        then
+            input="${temp_dir}/${dest}.stdin"
+        else
+            input=/dev/null
+        fi
+        if [ -z "${output_dir}" ]
+        then
+            output_file=/dev/null
+        else
+            mkdir -p    "${output_dir}/${dest}"
+            output_file="${output_dir}/${dest}/${output_name}"
+        fi
+        if ${silent}
+        then
+            stdout=/dev/null
+            stderr=/dev/null
+        else
+            stdout=/dev/stdout
+            stderr=/dev/stderr
+        fi
+        if ${label_is_enabled}
+        then
+            stdout_label="\033[3${color}m${dest}\t|\033[0m "
+            stderr_label="\033[3${color}m${dest}\t\033[31m!\033[0m "
+        else
+            stdout_label=''
+            stderr_label=''
+        fi
 
-            cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
-                1> >(tee "${output_file}" | awk -v label="${stdout_label}" "{ print label\$0; fflush() }" > "${stdout}") \
-                2> >(awk -v label="${stderr_label}" "{ print label\$0; fflush() }" > "${stderr}")
-        '
-    } &
+        cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
+            1> >(tee "${output_file}" | awk -v label="${stdout_label}" "{ print label\$0; fflush() }" > "${stdout}") \
+            2> >(awk -v label="${stderr_label}" "{ print label\$0; fflush() }" > "${stderr}")
+    ' &
 
     if ${pipe_is_enabled}
     then
