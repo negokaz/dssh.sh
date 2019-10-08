@@ -10,27 +10,39 @@ ssh client script for distributed systems
 Usage: ${script_name} [options...] [--] [command]
 <options>:
     -h, --help                  Print help
+    
     -d, --ssh <destination>     Set destinations
-    -f, --dests-file <file>     Read destinations from the given file which is written one destination per line
+    
+    -f, --dests-file <file>     Read destinations from the given file 
+                                which is written one destination per line
+
     -n, --no-label              Output without destination label
-    -o, --output-dir <path>     Save stdout from servers to files in the given directory
+
+    -o, --output-dir <path>     Save stdout from servers to files
+                                in the given directory
+
     -a, --output-name <name>    Save stdout as the given file name in output-dir
                                 (default: out)
+    
     -s, --silent                Don't output anything
+    
     -v, --verbose               Describe what happened in detail
+    
         --                      Process following arguments as commands
+
 <command>:
     execute in the destinations
 
 Examples:
     # Watch log being in destination servers
-    ${script_name} --ssh user@26.10.10.10 --ssh user@26.10.10.11 tail -F /var/log/messages
+    ${script_name} --ssh user@server1 --ssh user@server2 tail -F /var/log/messages
 
     # Watch log with destination file
     ${script_name} -f ssh.dests tail -F /var/log/messages
 
     # Collect ERROR logs on server and sort they on local
-    ${script_name} -f ssh.dests --no-label bash -c 'cat /var/log/messages | grep ERROR' | sort | less -R
+    ${script_name} -f ssh.dests --no-label bash -c 'cat /var/log/messages | 
+        grep ERROR' | sort | less -R
 
     # Publish a file to destination servers
     cat source.txt | ${script_name} -f ssh.dests tee /tmp/dest.txt

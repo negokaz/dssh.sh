@@ -26,6 +26,12 @@ function teardown {
     [ "${lines[1]}" == "${expected_usage}" ]
 }
 
+@test "width of help output is less than 80" {
+
+    run dssh.sh --help
+    diff <(echo "${output}") <(echo "${output}" | fold -w 80)
+}
+
 @test "-d/--ssh option" {
 
     run dssh.sh -d user@host1 --ssh user@host2 echo hello
