@@ -103,7 +103,7 @@ function main {
         ssh_options='-o LogLevel=QUIET'
     fi
 
-    execute_on_sshs
+    dispatch_command_to_dests
 }
 
 function parse_arguments {
@@ -193,63 +193,27 @@ function on_exit {
 
 trap 'on_exit' EXIT
 
-function execute_on_sshs {
+function dispatch_command_to_dests {
 
     if ${pipe_is_enabled}
     then
         echo "${ssh_dests}" | xargs -I %DEST% mkfifo "${temp_dir}/%DEST%.stdin"
     fi
 
+    export -f exec_command_via_ssh
+
     # execute command via ssh
     echo "${ssh_dests}" | awk '{ print (NR % 6) + 1, $0 }' | xargs -I %COLOR_AND_DEST% -P ${parallelism} \
     env \
         pipe_is_enabled="${pipe_is_enabled}" \
         label_is_enabled="${label_is_enabled}" \
-        color_and_dest="%COLOR_AND_DEST%" \
         temp_dir="${temp_dir}" \
         output_dir="${output_dir}" \
         output_name="${output_name}" \
         silent="${silent}" \
         ssh_options="${ssh_options}" \
         ssh_command="${command}" \
-    bash -c '
-        color_and_dest=(${color_and_dest})
-        color="${color_and_dest[0]}"
-        dest="${color_and_dest[1]}"
-        if ${pipe_is_enabled}
-        then
-            input="${temp_dir}/${dest}.stdin"
-        else
-            input=/dev/null
-        fi
-        if [ -z "${output_dir}" ]
-        then
-            output_file=/dev/null
-        else
-            mkdir -p    "${output_dir}/${dest}"
-            output_file="${output_dir}/${dest}/${output_name}"
-        fi
-        if ${silent}
-        then
-            stdout=/dev/null
-            stderr=/dev/null
-        else
-            stdout=/dev/stdout
-            stderr=/dev/stderr
-        fi
-        if ${label_is_enabled}
-        then
-            stdout_label="\033[3${color}m${dest}\t|\033[0m "
-            stderr_label="\033[3${color}m${dest}\t\033[31m!\033[0m "
-        else
-            stdout_label=''
-            stderr_label=''
-        fi
-
-        cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
-            1> >(tee "${output_file}" | awk -v label="${stdout_label}" "{ print label\$0; fflush() }" > "${stdout}") \
-            2> >(awk -v label="${stderr_label}" "{ print label\$0; fflush() }" > "${stderr}")
-    ' &
+    bash -c 'exec_command_via_ssh %COLOR_AND_DEST%' &
 
     if ${pipe_is_enabled}
     then
@@ -257,6 +221,44 @@ function execute_on_sshs {
         tee $(find "${temp_dir}" -type p) > /dev/null
     fi
     wait
+}
+
+function exec_command_via_ssh {
+    local color="$1" dest="$2"
+
+    if ${pipe_is_enabled}
+    then
+        input="${temp_dir}/${dest}.stdin"
+    else
+        input=/dev/null
+    fi
+    if [ -z "${output_dir}" ]
+    then
+        output_file=/dev/null
+    else
+        mkdir -p    "${output_dir}/${dest}"
+        output_file="${output_dir}/${dest}/${output_name}"
+    fi
+    if ${silent}
+    then
+        stdout=/dev/null
+        stderr=/dev/null
+    else
+        stdout=/dev/stdout
+        stderr=/dev/stderr
+    fi
+    if ${label_is_enabled}
+    then
+        stdout_label="\033[3${color}m${dest}\t|\033[0m "
+        stderr_label="\033[3${color}m${dest}\t\033[31m!\033[0m "
+    else
+        stdout_label=''
+        stderr_label=''
+    fi
+
+    cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
+        1> >(tee "${output_file}" | awk -v label="${stdout_label}" '{ print label$0; fflush() }' > "${stdout}") \
+        2> >(awk -v label="${stderr_label}" '{ print label$0; fflush() }' > "${stderr}")
 }
 
 main "$@"
