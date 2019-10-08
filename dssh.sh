@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o allexport
+
 readonly script_name=$(basename "$0")
 
 function print_usage {
@@ -42,7 +44,7 @@ END_OF_USAGE
 ssh_dests=''
 
 # [Require]
-command=''
+ssh_command=''
 
 # [Option]
 label_is_enabled='true'
@@ -82,7 +84,7 @@ function main {
     fi
     
     # validate arguments
-    if [ -z "${ssh_dests}" -o -z "${command}" ]
+    if [ -z "${ssh_dests}" -o -z "${ssh_command}" ]
     then
         print_usage
         exit 1
@@ -173,7 +175,7 @@ function parse_arguments {
                 shift 1
                 ;;
             *)
-                command="${command} '$1'"
+                ssh_command="${ssh_command} '$1'"
                 shift 1
                 ;;
         esac
@@ -187,7 +189,7 @@ temp_dir="$(mktemp -d)"
 
 function on_exit {
     # kill all child processes
-    /usr/bin/env kill -PIPE -- -$$
+    /usr/bin/env kill -PIPE -- -$$ &> /dev/null
     rm -rf "${temp_dir}"
 }
 
@@ -200,20 +202,14 @@ function dispatch_command_to_dests {
         echo "${ssh_dests}" | xargs -I %DEST% mkfifo "${temp_dir}/%DEST%.stdin"
     fi
 
-    export -f exec_command_via_ssh
-
     # execute command via ssh
-    echo "${ssh_dests}" | awk '{ print (NR % 6) + 1, $0 }' | xargs -I %COLOR_AND_DEST% -P ${parallelism} \
-    env \
-        pipe_is_enabled="${pipe_is_enabled}" \
-        label_is_enabled="${label_is_enabled}" \
-        temp_dir="${temp_dir}" \
-        output_dir="${output_dir}" \
-        output_name="${output_name}" \
-        silent="${silent}" \
-        ssh_options="${ssh_options}" \
-        ssh_command="${command}" \
-    bash -c 'exec_command_via_ssh %COLOR_AND_DEST%' &
+    echo "${ssh_dests}" | awk '{
+        dest  = $0
+        color = (NR % 6) + 1
+
+        # arguments for exec_command_via_ssh
+        print color, dest
+    }' | xargs -I %ARGS% -P ${parallelism} bash -c 'exec_command_via_ssh %ARGS%' &
 
     if ${pipe_is_enabled}
     then
