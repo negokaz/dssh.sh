@@ -199,13 +199,18 @@ function parse_arguments {
 
 temp_dir="$(mktemp -d)"
 
-function on_exit {
+function on_interrupt_signal {
     # kill all child processes
     /usr/bin/env kill -PIPE -- -$$ &> /dev/null
+}
+
+trap on_interrupt_signal SIGHUP SIGINT SIGQUIT SIGTERM 
+
+function on_exit {
     rm -rf "${temp_dir}"
 }
 
-trap 'on_exit' EXIT
+trap on_exit EXIT
 
 function dispatch_command_to_dests {
 
