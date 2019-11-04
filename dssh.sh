@@ -197,10 +197,16 @@ function parse_arguments {
     ssh_dests=$(echo "$ssh_dests" | tr ' ' '\n' | sed -E '/^$/d' | sort | uniq)
 }
 
-temp_dir="$(mktemp -d)"
+readonly temp_dir="$(mktemp -d)"
+readonly setsid_pgid_file="${temp_dir}/setsid.pgid"
 
 function on_interrupt_signal {
-    # kill all child processes
+    # kill all sub session
+    if [[ -f "${setsid_pgid_file}" ]]
+    then
+        /usr/bin/env kill -PIPE -- -$(cat "${setsid_pgid_file}") &> /dev/null
+    fi
+    # kill all process group
     /usr/bin/env kill -PIPE -- -$$ &> /dev/null
 }
 
@@ -226,7 +232,7 @@ function dispatch_command_to_dests {
 
         # arguments for exec_command_via_ssh
         print color, dest
-    }' | xargs -I %ARGS% -P ${parallelism} bash -c 'exec_command_via_ssh %ARGS%' &
+    }' | setsid xargs -I %ARGS% -P ${parallelism} bash -c 'exec_command_via_ssh %ARGS%' &
 
     if ${pipe_is_enabled}
     then
@@ -269,9 +275,25 @@ function exec_command_via_ssh {
         stderr_label=''
     fi
 
+    # to enable ssh-askpass
+    export DISPLAY="${DISPLAY:-dummy:0}"
+
     cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
         1> >(tee "${output_file}" | awk -v label="${stdout_label}" '{ print label$0; fflush() }' > "${stdout}") \
         2> >(awk -v label="${stderr_label}" '{ print label$0; fflush() }' > "${stderr}")
+}
+
+function setsid {
+    perl -E '
+        use POSIX setsid;
+        setsid() or die "Failed to create new session";
+
+        open my $file, ">", $ENV{setsid_pgid_file};
+        print $file getpgrp();
+        close $file or die "Failed to close PGID file";
+
+        exec @ARGV;
+    ' "$@"
 }
 
 main "$@"
