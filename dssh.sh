@@ -10,10 +10,10 @@ ssh client script for distributed systems
 Usage: ${script_name} [options...] [--] [command]
 <options>:
     -h, --help                  Print help
-    
+
     -d, --ssh <destination>     Set destinations
-    
-    -f, --dests-file <file>     Read destinations from the given file 
+
+    -f, --dests-file <file>     Read destinations from the given file
                                 which is written one destination per line
 
     -n, --no-label              Output without destination label
@@ -23,11 +23,11 @@ Usage: ${script_name} [options...] [--] [command]
 
     -a, --output-name <name>    Save stdout as the given file name in output-dir
                                 (default: out)
-    
+
     -s, --silent                Don't output anything
-    
+
     -v, --verbose               Describe what happened in detail
-    
+
         --                      Process following arguments as commands
 
 <command>:
@@ -41,7 +41,7 @@ Examples:
     ${script_name} -f ssh.dests tail -F /var/log/messages
 
     # Collect ERROR logs on server and sort they on local
-    ${script_name} -f ssh.dests --no-label bash -c 'cat /var/log/messages | 
+    ${script_name} -f ssh.dests --no-label bash -c 'cat /var/log/messages |
         grep ERROR' | sort | less -R
 
     # Publish a file to destination servers
@@ -94,11 +94,15 @@ function main {
         print_usage
         exit 0
     fi
-    
+
     # validate arguments
     if [ -z "${ssh_dests}" -o -z "${ssh_command}" ]
     then
-        print_usage
+        {
+            echo '[ERROR] Destinations and command is required'
+            echo
+            print_usage
+        } >&2
         exit 1
     fi
 
@@ -111,7 +115,7 @@ function main {
     fi
 
     parallelism=$(echo "${ssh_dests}" | wc -l)
-    
+
     if ! ${verbose}
     then
         ssh_options='-o LogLevel=QUIET'
@@ -163,7 +167,7 @@ function parse_arguments {
                 ;;
             -*)
                 {
-                    echo "Unknown option: $1"
+                    echo "[ERROR] Unknown option: $1"
                     echo
                     print_usage
                 } >&2
@@ -210,7 +214,7 @@ function on_interrupt_signal {
     /usr/bin/env kill -PIPE -- -$$ &> /dev/null
 }
 
-trap on_interrupt_signal SIGHUP SIGINT SIGQUIT SIGTERM 
+trap on_interrupt_signal SIGHUP SIGINT SIGQUIT SIGTERM
 
 function on_exit {
     rm -rf "${temp_dir}"
