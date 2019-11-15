@@ -116,9 +116,9 @@ function main {
 
     parallelism=$(echo "${ssh_dests}" | wc -l)
 
-    if ! ${verbose}
+    if ${verbose}
     then
-        ssh_options='-o LogLevel=QUIET'
+        ssh_options='-o LogLevel=VERBOSE'
     fi
 
     dispatch_command_to_dests
