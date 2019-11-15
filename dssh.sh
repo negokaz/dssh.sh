@@ -208,7 +208,7 @@ function on_interrupt_signal {
     # kill all sub session
     if [[ -f "${setsid_pgid_file}" ]]
     then
-        /usr/bin/env kill -PIPE -- -$(cat "${setsid_pgid_file}") &> /dev/null
+        /usr/bin/env kill -INT -- -$(cat "${setsid_pgid_file}") &> /dev/null
     fi
     # kill all process group
     /usr/bin/env kill -PIPE -- -$$ &> /dev/null
