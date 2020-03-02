@@ -107,11 +107,11 @@ function main {
     fi
 
     # other props
-    if tty -s
+    if test -p /dev/stdin
     then
-        pipe_is_enabled='false'
-    else
         pipe_is_enabled='true'
+    else
+        pipe_is_enabled='false'
     fi
 
     parallelism=$(echo "${ssh_dests}" | wc -l)
