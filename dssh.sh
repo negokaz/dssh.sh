@@ -262,14 +262,6 @@ function exec_command_via_ssh {
         mkdir -p    "${output_dir}/${dest}"
         output_file="${output_dir}/${dest}/${output_name}"
     fi
-    if ${silent}
-    then
-        stdout=/dev/null
-        stderr=/dev/null
-    else
-        stdout=/dev/stdout
-        stderr=/dev/stderr
-    fi
     if ${label_is_enabled}
     then
         stdout_label="\033[3${color}m${dest}\t|\033[0m "
@@ -279,12 +271,17 @@ function exec_command_via_ssh {
         stderr_label=''
     fi
 
+    if ${silent}
+    then
+        exec 1>/dev/null 2>/dev/null
+    fi
+
     # to enable ssh-askpass
     export DISPLAY="${DISPLAY:-dummy:0}"
 
     cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
-        1> >(tee "${output_file}" | awk -v label="${stdout_label}" '{ print label$0; fflush() }' > "${stdout}") \
-        2> >(awk -v label="${stderr_label}" '{ print label$0; fflush() }' > "${stderr}")
+        1> >(tee "${output_file}" | awk -v label="${stdout_label}" '{ print label$0; fflush() }' >&1) \
+        2> >(awk -v label="${stderr_label}" '{ print label$0; fflush() }' >&2)
 }
 
 function setsid {
