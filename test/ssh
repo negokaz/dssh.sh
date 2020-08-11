@@ -14,4 +14,4 @@ do
     esac
 done
 
-bash -c "$@"
+exec bash -c "$@"

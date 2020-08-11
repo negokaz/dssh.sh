@@ -205,7 +205,7 @@ readonly temp_dir="$(mktemp -d)"
 
 function on_interrupt_signal {
     # kill all process group
-    /usr/bin/env kill -PIPE -- -$$ &> /dev/null
+    /usr/bin/env kill -PIPE -- $(jobs -p) &> /dev/null
 }
 
 trap on_interrupt_signal SIGHUP SIGINT SIGQUIT SIGTERM
@@ -223,8 +223,10 @@ function dispatch_command_to_dests {
         echo "${ssh_dests}" | xargs -I %DEST% mkfifo "${temp_dir}/%DEST%.stdin"
     fi
 
-    # execute command via ssh
-    xargs -I %ARGS% -P ${parallelism} bash -c 'exec_command_via_ssh %ARGS%' < <(create_exec_args) &
+    while read dest color
+    do
+        exec_command_via_ssh ${dest} ${color} &
+    done < <(create_exec_args)
 
     if ${pipe_is_enabled}
     then
@@ -249,9 +251,9 @@ function exec_command_via_ssh {
 
     if ${pipe_is_enabled}
     then
-        input="${temp_dir}/${dest}.stdin"
+        exec < "${temp_dir}/${dest}.stdin"
     else
-        input=/dev/null
+        exec < /dev/null
     fi
     if [ -z "${output_dir}" ]
     then
@@ -277,7 +279,7 @@ function exec_command_via_ssh {
     # to enable ssh-askpass
     export DISPLAY="${DISPLAY:-dummy:0}"
 
-    cat "${input}" | ssh ${ssh_options} "${dest}" "${ssh_command}" \
+    exec ssh ${ssh_options} "${dest}" "${ssh_command}" \
         1> >(tee "${output_file}" | awk -v label="${stdout_label}" '{ print label$0; fflush() }' >&1) \
         2> >(awk -v label="${stderr_label}" '{ print label$0; fflush() }' >&2)
 }
