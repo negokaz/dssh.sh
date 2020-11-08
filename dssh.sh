@@ -16,6 +16,9 @@ Usage: ${script_name} [options...] [--] [command]
     -f, --dests-file <file>     Read destinations from the given file
                                 which is written one destination per line
 
+    -S, --sequential <interval> Exexute command sequentially
+                                (default interval: 0)
+
     -n, --no-label              Output without destination label
 
     -o, --output-dir <path>     Save stdout from servers to files
@@ -57,6 +60,12 @@ ssh_dests=''
 
 # [Require]
 ssh_command=''
+
+# [Option]
+sequential='false'
+
+# [Option]
+sequential_interval=0
 
 # [Option]
 label_is_enabled='true'
@@ -141,6 +150,15 @@ function parse_arguments {
                 ssh_dests="${ssh_dests}"$'\n'"$(cat "$2")"
                 shift 2
                 ;;
+            '-S' | '--sequential' )
+                sequential='true'
+                if [[ "$2" =~ ^[0-9]+$ ]]; then
+                    sequential_interval=$2
+                    shift 2
+                else
+                    shift 1
+                fi
+                ;;
             '-n' | '--no-label' )
                 label_is_enabled='false'
                 shift 1
@@ -198,7 +216,7 @@ function parse_arguments {
     done
 
     # normalize input
-    ssh_dests=$(echo "$ssh_dests" | tr ' ' '\n' | sed -E '/^$/d' | sort | uniq)
+    ssh_dests=$(echo "$ssh_dests" | tr ' ' '\n' | sed -E '/^$/d')
 }
 
 readonly temp_dir="$(mktemp -d)"
@@ -206,6 +224,9 @@ readonly temp_dir="$(mktemp -d)"
 function on_interrupt_signal {
     # kill all process group
     /usr/bin/env kill -PIPE -- $(jobs -p) &> /dev/null
+
+    # cancel succeeding commands when sequential mode is enabled
+    exit 0
 }
 
 trap on_interrupt_signal SIGHUP SIGINT SIGQUIT SIGTERM
@@ -218,42 +239,69 @@ trap on_exit EXIT
 
 function dispatch_command_to_dests {
 
-    if ${pipe_is_enabled}
+    if ${sequential}
     then
-        echo "${ssh_dests}" | xargs -I %DEST% mkfifo "${temp_dir}/%DEST%.stdin"
-    fi
+        if ${pipe_is_enabled}
+        then
+            local stdin_file="${temp_dir}/${dest}.stdin"
+            cat - > "${stdin_file}"
+        else
+            local stdin_file=""
+        fi
+        while read color dest head_dest
+        do
+            if [[ "${dest}" != "${head_dest}" ]]
+            then
+                sleep ${sequential_interval}
+            fi
+            # spawn subprocess
+            (exec_command_via_ssh ${color} ${dest} "${stdin_file}")
+        done < <(create_exec_args)
+    else
+        # execute in parallel
+        while read color dest head_dest
+        do
+            if ${pipe_is_enabled}
+            then
+                local stdin_fifo="${temp_dir}/${dest}.stdin"
+                mkfifo "${stdin_fifo}"
+            else
+                local stdin_fifo=""
+            fi
+            exec_command_via_ssh ${color} ${dest} "${stdin_fifo}" &
+        done < <(create_exec_args)
 
-    while read dest color
-    do
-        exec_command_via_ssh ${dest} ${color} &
-    done < <(create_exec_args)
-
-    if ${pipe_is_enabled}
-    then
-        # broadcast stdin to dest
-        tee $(find "${temp_dir}" -type p) > /dev/null
+        if ${pipe_is_enabled}
+        then
+            # broadcast stdin to dest
+            tee $(find "${temp_dir}" -type p) > /dev/null
+        fi
+        wait
     fi
-    wait
 }
 
 function create_exec_args {
-    echo "${ssh_dests}" | awk '{
+    echo "${ssh_dests}" | awk '
+    NR == 1 {
+      head_dest = $0
+    }
+    {
         dest  = $0
         color = (NR % 6) + 1
 
         # arguments for exec_command_via_ssh
-        print color, dest
+        print color, dest, head_dest
     }'
 }
 
 function exec_command_via_ssh {
-    local color="$1" dest="$2"
+    local color="$1" dest="$2" stdin="$3"
 
-    if ${pipe_is_enabled}
+    if [ -z "${stdin}" ]
     then
-        exec < "${temp_dir}/${dest}.stdin"
-    else
         exec < /dev/null
+    else
+        exec < "${stdin}"
     fi
     if [ -z "${output_dir}" ]
     then

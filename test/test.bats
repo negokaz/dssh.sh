@@ -51,6 +51,40 @@ function teardown {
     [ "${status}" -eq 0 ]
 }
 
+@test "-S/--sequential option without interval" {
+
+    run dssh.sh --ssh user@host1 --ssh user@host2 --sequential echo hello
+    assert_success
+    assert_line --index 0 --partial 'user@host1'
+    assert_line --index 0 --partial 'hello'
+    assert_line --index 1 --partial 'user@host2'
+    assert_line --index 1 --partial 'hello'
+
+    run dssh.sh --ssh user@host1 --ssh user@host2 -S echo hello
+    assert_success
+    assert_line --index 0 --partial 'user@host1'
+    assert_line --index 0 --partial 'hello'
+    assert_line --index 1 --partial 'user@host2'
+    assert_line --index 1 --partial 'hello'
+}
+
+@test "-S/--sequential option with interval" {
+
+    run dssh.sh --ssh user@host1 --ssh user@host2 --sequential 1 echo hello
+    assert_success
+    assert_line --index 0 --partial 'user@host1'
+    assert_line --index 0 --partial 'hello'
+    assert_line --index 1 --partial 'user@host2'
+    assert_line --index 1 --partial 'hello'
+
+    run dssh.sh --ssh user@host1 --ssh user@host2 -S 1 echo hello
+    assert_success
+    assert_line --index 0 --partial 'user@host1'
+    assert_line --index 0 --partial 'hello'
+    assert_line --index 1 --partial 'user@host2'
+    assert_line --index 1 --partial 'hello'
+}
+
 @test "-n/--no-label option" {
 
     run dssh.sh -n --ssh user@host1 echo hello
