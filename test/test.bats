@@ -1,6 +1,9 @@
 #!/usr/bin/env bats
 
 function setup {
+    load '../node_modules/bats-support/load'
+    load '../node_modules/bats-assert/load'
+
     dssh_path="${BATS_TEST_DIRNAME}/.."
     dssh_test_path="${BATS_TEST_DIRNAME}"
     temp_path=$(mktemp -d)

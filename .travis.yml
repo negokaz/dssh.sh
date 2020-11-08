@@ -1,7 +1,5 @@
-language: bash
-before_install:
-  - sudo add-apt-repository ppa:duggan/bats --yes
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq bats
+language: node_js
+node_js:
+  - 15
 script:
-  - bats ./test/test.bats
+  - bats --timing ./test
