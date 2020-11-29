@@ -129,6 +129,16 @@ function teardown {
 
 @test "use pipe" {
 
-    run bash -c 'echo "hello" | dssh.sh --ssh user@host1 cat -'
+    run bash -c 'echo "hello" | dssh.sh --ssh user@host1 --ssh user@host2 cat -'
     assert_success
+    assert_line --partial 'user@host1'
+    assert_line --partial 'user@host2'
+}
+
+@test "use pipe with --sequential" {
+
+    run bash -c 'echo "hello" | dssh.sh --ssh user@host1 --ssh user@host2 --sequential 1 cat -'
+    assert_success
+    assert_line --index 0 --partial 'user@host1'
+    assert_line --index 1 --partial 'user@host2'
 }
