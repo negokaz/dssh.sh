@@ -10,7 +10,6 @@ ssh client script for distributed systems
 
 - `bash`
 - `ssh`
-- `perl`
 - *nix basic commands (`xargs`, `cat`, and so on)
 
 ## Install
