@@ -1,0 +1,29 @@
+name: Node.js CI
+
+on: [push]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - name: Install dependencies
+      run: |
+        yarn --frozen-lockfile
+        echo "node_modules/.bin" >> $GITHUB_PATH
+    - name: Run test
+      run: |
+        bats --timing test
