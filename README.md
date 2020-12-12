@@ -1,6 +1,6 @@
 # dssh.sh
 
-[![Build Status](https://travis-ci.org/negokaz/dssh.sh.svg?branch=master)](https://travis-ci.org/negokaz/dssh.sh)
+![test](https://github.com/negokaz/dssh.sh/workflows/test/badge.svg)
 
 ssh client script for distributed systems
 
