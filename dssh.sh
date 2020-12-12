@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -o allexport
-
 readonly version='0.1.0'
 
 readonly script_name=$(basename "$0")
