@@ -1,5 +1,0 @@
-language: node_js
-node_js:
-  - 15
-script:
-  - bats --timing ./test
