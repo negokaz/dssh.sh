@@ -29,6 +29,18 @@ function teardown {
     assert_line --index 1 "${expected_usage}"
 }
 
+@test "print version by -V/--version option" {
+    expected_regexp='[0-9]+\.[0-9]+\.[0-9]+'
+
+    run dssh.sh -V
+    assert_success
+    assert_output --regexp "${expected_regexp}"
+
+    run dssh.sh --version
+    assert_success
+    assert_output --regexp "${expected_regexp}"
+}
+
 @test "width of help output is less than 80" {
 
     run dssh.sh --help

@@ -2,14 +2,18 @@
 
 set -o allexport
 
+readonly version='0.1.0'
+
 readonly script_name=$(basename "$0")
 
 function print_usage {
     cat - <<END_OF_USAGE
-ssh client script for distributed systems
+dssh ${version}, ssh client script for distributed systems
 Usage: ${script_name} [options...] [--] [command]
 <options>:
     -h, --help                  Print help
+
+    -V, --version               Print version
 
     -d, --ssh <destination>     Set destinations
 
@@ -55,6 +59,10 @@ Examples:
 END_OF_USAGE
 }
 
+function print_version {
+    echo "${version}"
+}
+
 # [Require]
 ssh_dests=''
 
@@ -85,6 +93,9 @@ verbose='false'
 # [Option]
 help='false'
 
+# [Option]
+want_to_know_version='false'
+
 # true if pipe is enabled
 pipe_is_enabled='false'
 
@@ -101,6 +112,12 @@ function main {
     if ${help}
     then
         print_usage
+        exit 0
+    fi
+
+    if ${want_to_know_version}
+    then
+        print_version
         exit 0
     fi
 
@@ -140,6 +157,10 @@ function parse_arguments {
         case "$1" in
             '-h' | '--help' )
                 help='true'
+                shift 1
+                ;;
+            '-V' | '--version' )
+                want_to_know_version='true'
                 shift 1
                 ;;
             '-d' | '--ssh' )
