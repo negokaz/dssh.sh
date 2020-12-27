@@ -63,6 +63,26 @@ function teardown {
     assert_success
 }
 
+@test "-f/--dests-file option parses unnormalized file" {
+    cat - <<EOF > "${temp_path}/ssh.dests"
+# comment
+user@host1 # comment
+  user@host2 # unnecessary spaces exit
+# empty line
+
+EOF
+
+    run dssh.sh -f "${temp_path}/ssh.dests" echo hello
+    assert_success
+    assert_line --regexp '^user@host1\t| hello'
+    assert_line --regexp '^user@host2\t| hello'
+
+    run dssh.sh --dests-file "${temp_path}/ssh.dests" echo hello
+    assert_success
+    assert_line --regexp '^user@host1\t| hello'
+    assert_line --regexp '^user@host2\t| hello'
+}
+
 @test "-S/--sequential option without interval" {
 
     run dssh.sh --ssh user@host1 --ssh user@host2 --sequential echo hello
