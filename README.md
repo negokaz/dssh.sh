@@ -1,6 +1,7 @@
 # dssh.sh
 
-![test](https://github.com/negokaz/dssh.sh/workflows/test/badge.svg)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/negokaz/dssh.sh?logoColor=%23000)](https://github.com/negokaz/dssh.sh/releases)
+[![test](https://github.com/negokaz/dssh.sh/workflows/test/badge.svg)](https://github.com/negokaz/dssh.sh/actions?query=workflow%3Atest)
 
 ssh client script for distributed systems
 
