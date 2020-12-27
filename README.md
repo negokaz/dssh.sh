@@ -5,7 +5,7 @@
 
 ssh client script for distributed systems
 
-![](docs/img/ping.gif)
+![](docs/img/demo.gif)
 
 ## Requirements
 
