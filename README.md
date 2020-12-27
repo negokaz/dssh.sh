@@ -27,7 +27,7 @@ chmod +x /usr/local/bin/dssh.sh
 ### Watch log being in destination servers
 
 ```
-dssh.sh --ssh user@26.10.10.10 --ssh user@26.10.10.11 tail -F /var/log/messages
+dssh.sh --ssh user@192.168.10.10 --ssh user@192.168.10.11 tail -F /var/log/messages
 ```
 
 ### Watch log with destination file
@@ -52,6 +52,19 @@ cat source.txt | dssh.sh -f ssh.dests --silent tee /tmp/dest.txt
 
 ```
 dssh.sh -f ssh.dests -o out -a messages.log --silent cat /var/log/messages
+```
+
+## Destination file format
+
+A destination file (`*.dests`) is a file that contains destinations for ssh.
+
+Destinations are separated by line feeds like this:
+
+```bash
+# This is a comment
+user@192.168.10.10
+
+user@192.168.10.11 # You can place comments like a shell script
 ```
 
 ## License

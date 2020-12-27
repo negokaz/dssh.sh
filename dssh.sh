@@ -237,7 +237,7 @@ function parse_arguments {
     done
 
     # normalize input
-    ssh_dests=$(echo "$ssh_dests" | tr ' ' '\n' | sed -E '/^$/d')
+    ssh_dests=$(echo "$ssh_dests" | sed -E -e 's/#.*$//g' -e '/^ *$/d')
 }
 
 readonly temp_dir="$(mktemp -d)"
