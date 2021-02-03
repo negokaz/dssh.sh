@@ -7,13 +7,15 @@ defaults:
     shell: bash
 
 jobs:
-  build:
+  test:
 
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
+
+    timeout-minutes: 5
 
     steps:
     - uses: actions/checkout@v2

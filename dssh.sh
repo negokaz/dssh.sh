@@ -2,7 +2,7 @@
 
 set -o allexport
 
-readonly version='0.1.0'
+readonly version='0.2.0'
 
 readonly script_name=$(basename "$0")
 
@@ -99,9 +99,6 @@ want_to_know_version='false'
 # true if pipe is enabled
 pipe_is_enabled='false'
 
-# equals number of ssh_dests
-parallelism=-1
-
 # set when verbose mode
 ssh_options=''
 
@@ -139,8 +136,6 @@ function main {
     else
         pipe_is_enabled='false'
     fi
-
-    parallelism=$(echo "${ssh_dests}" | wc -l)
 
     if ${verbose}
     then

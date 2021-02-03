@@ -1,0 +1,189 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: C:\msys64\usr\bin\bash.exe
+
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: null
+
+  # Export additional ENV variables
+  env:
+    recording: true
+
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 108
+
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 23
+
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+
+  # Quality
+  # 1 - 100
+  quality: 100
+
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 2000
+
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: solid
+    title: null
+    style:
+      border: 0px black solid
+      # boxShadow: none
+      # margin: 0px
+
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
+
+  # The size of the font
+  fontSize: 14
+
+  # The height of lines
+  lineHeight: 1.2
+
+  # The spacing between letters
+  letterSpacing: 0
+
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#2f2833"
+    red: "#fc644d"
+    green: "#38de21"
+    yellow: "#ffe50a"
+    blue: "#1460d2"
+    magenta: "#f92672"
+    cyan: "#74d3de"
+    white: "#d5ced9"
+    brightBlack: "#7e6c88"
+    brightRed: "#fc644d"
+    brightGreen: "#a5f69c"
+    brightYellow: "#e9d7a5"
+    brightBlue: "#3b79c7"
+    brightMagenta: "#f92672"
+    brightCyan: "#74d3de"
+    brightWhite: "#ffffff"
+
+# Records, feel free to edit them
+records:
+  - delay: 500
+    content: "\e[2J\e[m\e[H❯\e[1C\e]0;C:\\msys64\\usr\\bin\\bash.exe\a\e[?25h"
+  - delay: 500
+    content: '# Execute a command on each nodes'
+  - delay: 1000
+    content: "\r\n"
+  - delay: 10
+    content: '❯ '
+  - delay: 500
+    content: >-
+      dssh.sh --ssh negokaz@node1 --ssh negokaz@node2 --ssh negokaz@node3 echo
+      Hello, world
+  - delay: 2000
+    content: "\r\n"
+  - delay: 3000
+    content: "\e[32mnegokaz@node1\e[m   \e[32m|\e[m Hello, world\r\n"
+  - delay: 10
+    content: "\e[34m\rnegokaz@node3\e[m   \e[34m|\e[m Hello, world\r\n"
+  - delay: 10
+    content: "\e[33m\rnegokaz@node2\e[m   \e[33m|\e[m Hello, world\r\n"
+  - delay: 10
+    content: '❯ '
+  - delay: 10
+    content: "\r\n"
+  - delay: 10
+    content: '❯ '
+  - delay: 2000
+    content: '# Watch log being in destination servers'
+  - delay: 1000
+    content: "\r\n"
+  - delay: 10
+    content: '❯ '
+  - delay: 500
+    content: >-
+      dssh.sh --ssh negokaz@node1 --ssh negokaz@node2 --ssh negokaz@node3 tail
+      -F /var/log/cassandra/system.log
+  - delay: 2000
+    content: "\r\n"
+  - delay: 3000
+    content: "\e[32mnegokaz@node1\e[m   \e[32m|"
+  - delay: 5
+    content: "\e[m\e[32m\rnegokaz@node1\e[m   \e[32m|\e[m INFO  [HANDSHAKE-/172.26.0.4] 03:58:42,294 OutboundTcpConnection.java:561 - Han\r\ndshaking version with /172.26.0.4\e[K\e[32m\r\nnegokaz@node1\e[m   \e[32m|\e[m INFO  [main] 03:58:48,940 Gossiper.java:1825 - No gossip backlog; proceeding   \e[32m\r\nnegokaz@node1\e[m   \e[32m|\e[m INFO  [main] 03:58:49,123 NativeTransportService.java:68 - Netty using native E\r\npoll event loop\e[K\e[32m\r\nnegokaz@node1\e[m   \e[32m|\e[m INFO  [main] 03:58:49,180 Server.java:158 - Using Netty Version: [netty-buffer=\r\nnetty-buffer-4.0.44.Final.452812a, netty-codec=netty-codec-4.0.44.Final.452812a, netty-codec-haproxy=netty-c\r\nodec-haproxy-4.0.44.Final.452812a, netty-codec-http=netty-codec-http-4.0.44.Final.452812a, netty-codec-socks\r\n=netty-codec-socks-4.0.44.Final.452812a, netty-common=netty-common-4.0.44.Final.452812a, netty-handler=netty\r\n-handler-4.0.44.Final.452812a, netty-tcnative=netty-tcnative-1.1.33.Fork26.142ecbb, netty-transport=netty-tr\r\nansport-4.0.44.Final.452812a, netty-transport-native-epoll=netty-transport-native-epoll-4.0.44.Final.452812a\r\n, netty-transport-rxtx=netty-transport-rxtx-4.0.44.Final.452812a, netty-transport-sctp=netty-transport-sctp-\r\n4.0.44.Final.452812a, netty-transport-udt=netty-transport-udt-4.0.44.Final.452812a]\e[K\e[32m\r\nnegokaz@node1\e[m   \e[32m|\e[m INFO  [main] 03:58:49,181 Server.java:159 - Starting listening for CQL clients \r\non /0.0.0.0:9042 (unencrypted)...\e[K\e[32m\r\nnegokaz@node1\e[m   \e[32m|\e[m INFO  [main] 03:58:49,246 ThriftServer.java:116 - Binding thrift service to /0.0.0.0:9160\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [Thread-2] 03:58:49,252 ThriftServer.java:133 - Listening for thrift clients...\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [main] 03:58:49,258 CassandraDaemon.java:548 - Not starting RPC server as requested. Use JMX (StorageService->startRPCServer()) or nodetool (enablethrift) to start it\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [GossipTasks:1] 03:59:42,293 Gossiper.java:893 - FatClient /172.25.0.3 has been silent for 30000ms, removing from gossip\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [GossipTasks:1] 03:59:42,294 Gossiper.java:893 - FatClient /172.25.0.4 has been silent for 30000ms, removing from gossip"
+  - delay: 10
+    content: "\r\n"
+  - delay: 8
+    content: "\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipStage:1] 03:58:42,539 Gossiper.java:1141 - Node /172.26.0.3 is now part of the cluster\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [HANDSHAKE-/172.26.0.3] 03:58:42,542 OutboundTcpConnection.java:561 - Handshaking version with /172.26.0.3\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m WARN  [GossipStage:1] 03:58:42,556 StorageService.java:2445 - Host ID collision for 32c291d8-9bc5-45eb-95e2-239090b3a508 between /172.25.0.4 and /172.26.0.3; /172.26.0.3 is the new owner \b\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipStage:1] 03:58:42,675 TokenMetadata.java:497 - Updating topology for /172.26.0.3\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipStage:1] 03:58:42,676 TokenMetadata.java:497 - Updating topology for /172.26.0.3\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m WARN  [GossipTasks:1] 03:58:42,682 FailureDetector.java:278 - Not marking nodes down due to local pause of 36632561300 > 5000000000\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipStage:1] 03:58:42,687 Gossiper.java:1103 - InetAddress /172.26.0.2 is now UP\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipStage:1] 03:58:42,689 Gossiper.java:1103 - InetAddress /172.26.0.3 is now UP\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipTasks:1] 03:59:43,711 Gossiper.java:893 - FatClient /172.25.0.2 has been silent for 30000ms, removing from gossip\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipTasks:1] 03:59:43,713 Gossiper.java:893 - FatClient /172.25.0.4 has been silent for 30000ms, removing from gossip"
+  - delay: 13
+    content: "\r\n"
+  - delay: 6
+    content: "\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipStage:1] 03:58:41,415 Gossiper.java:1141 - Node /172.26.0.4 is now part of the cluster\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [HANDSHAKE-/172.26.0.4] 03:58:41,421 OutboundTcpConnection.java:561 - Handshaking version with /172.26.0.4\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m WARN  [GossipStage:1] 03:58:41,426 StorageService.java:2445 - Host ID collision for 3500f25c-cafc-474d-9dbd-b3382550fd5a between /172.25.0.3 and /172.26.0.4; /172.26.0.4 is the new owner \b\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipStage:1] 03:58:41,552 TokenMetadata.java:497 - Updating topology for /172.26.0.4\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipStage:1] 03:58:41,553 TokenMetadata.java:497 - Updating topology for /172.26.0.4\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipStage:1] 03:58:41,557 Gossiper.java:1103 - InetAddress /172.26.0.2 is now UP\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipStage:1] 03:58:41,558 Gossiper.java:1103 - InetAddress /172.26.0.4 is now UP\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m\e[K INFO  [HANDSHAKE-/172.26.0.4] 03:58:42,546 OutboundTcpConnection.java:561 - Handshaking version with /172.26.0.4\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipTasks:1] 03:59:43,313 Gossiper.java:893 - FatClient /172.25.0.3 has been silent for 30000ms, removing from gossip\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipTasks:1] 03:59:43,315 Gossiper.java:893 - FatClient /172.25.0.2 has been silent for 30000ms, removing from gossip"
+  - delay: 13
+    content: "\r\n"
+  - delay: 1914
+    content: "\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [GossipStage:1] 04:07:00,327 Gossiper.java:1119 - InetAddress /172.26.0.4 is now DOWN\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [GossipStage:1] 04:07:00,422 StorageService.java:2400 - Node /172.26.0.3 state jump to shutdown\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [GossipStage:1] 04:07:00,424 Gossiper.java:1119 - InetAddress /172.26.0.3 is now DOWN\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [HANDSHAKE-/172.26.0.3] 04:07:00,467 OutboundTcpConnection.java:561 - Handshaking version with /172.26.0.3\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [HANDSHAKE-/172.26.0.4] 04:07:00,844 OutboundTcpConnection.java:561 - Handshaking version with /172.26.0.4"
+  - delay: 10
+    content: "\r\n"
+  - delay: 16
+    content: "\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,311 HintsService.java:209 - Paused hints dispatch\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,312 ThriftServer.java:139 - Stop listening to thrift clients\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,318 Server.java:179 - Stop listening for CQL clients\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,320 Gossiper.java:1661 - Announcing shutdown\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,323 StorageService.java:2400 - Node /172.26.0.4 state jump to shutdown\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [GossipStage:1] 04:07:00,449 StorageService.java:2400 - Node /172.26.0.3 state jump to shutdown"
+  - delay: 9
+    content: "\r\n"
+  - delay: 17
+    content: "\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [GossipStage:1] 04:07:00,404 Gossiper.java:1119 - InetAddress /172.26.0.4 is now DOWN\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,408 HintsService.java:209 - Paused hints dispatch\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,409 ThriftServer.java:139 - Stop listening to thrift clients\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,414 Server.java:179 - Stop listening for CQL clients\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,415 Gossiper.java:1661 - Announcing shutdown\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [StorageServiceShutdownHook] 04:07:00,418 StorageService.java:2400 - Node /172.26.0.3 state jump to shutdown\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [HANDSHAKE-/172.26.0.4] 04:07:00,443 OutboundTcpConnection.java:561 - Handshaking version with /172.26.0.4"
+  - delay: 11
+    content: "\r\n"
+  - delay: 1955
+    content: "\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:02,326 MessagingService.java:985 - Waiting for messaging service to quiesce\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [ACCEPT-/172.26.0.4] 04:07:02,327 MessagingService.java:1346 - MessagingService has terminated the accept() thread\r\n\e[33mnegokaz@node2\e[m   \e[33m|\e[m INFO  [StorageServiceShutdownHook] 04:07:02,958 HintsService.java:209 - Paused hints dispatch"
+  - delay: 14
+    content: "\r\n"
+  - delay: 14
+    content: "\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [StorageServiceShutdownHook] 04:07:02,420 MessagingService.java:985 - Waiting for messaging service to quiesce\r\n\e[34mnegokaz@node3\e[m   \e[34m|\e[m INFO  [ACCEPT-/172.26.0.3] 04:07:02,421 MessagingService.java:1346 - MessagingService has terminated the accept() thread"
+  - delay: 13
+    content: "\r\n"
+  - delay: 3000
+    content: "\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [StorageServiceShutdownHook] 04:07:10,218 HintsService.java:209 - Paused hints dispatch\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [StorageServiceShutdownHook] 04:07:10,220 ThriftServer.java:139 - Stop listening to thrift clients\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [StorageServiceShutdownHook] 04:07:10,225 Server.java:179 - Stop listening for CQL clients\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [StorageServiceShutdownHook] 04:07:10,227 Gossiper.java:1661 - Announcing shutdown\r\n\e[32mnegokaz@node1\e[m   \e[32m|\e[m INFO  [StorageServiceShutdownHook] 04:07:10,231 StorageService.java:2400 - Node /172.26.0.2 state jump to shutdown"
+  - delay: 6
+    content: "\r\n"

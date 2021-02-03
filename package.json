@@ -8,6 +8,10 @@
   "devDependencies": {
     "bats": "^1.2.1",
     "bats-assert": "^2.0.0",
-    "bats-support": "^0.3.0"
+    "bats-support": "^0.3.0",
+    "terminalizer": "^0.7.2"
+  },
+  "scripts": {
+    "render:demo": "terminalizer render --output docs/img/demo.gif docs/img/demo.yml"
   }
 }
