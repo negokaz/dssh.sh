@@ -7,7 +7,7 @@ defaults:
     shell: bash
 
 jobs:
-  build:
+  test:
 
     runs-on: ${{ matrix.os }}
 
