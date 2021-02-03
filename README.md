@@ -1,7 +1,7 @@
 # dssh.sh
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/negokaz/dssh.sh?logoColor=%23000)](https://github.com/negokaz/dssh.sh/releases)
-[![test](https://github.com/negokaz/dssh.sh/workflows/test/badge.svg?branch=master)](https://github.com/negokaz/dssh.sh/actions?query=workflow%3Atest)
+[![test](https://github.com/negokaz/dssh.sh/workflows/test/badge.svg?branch=main)](https://github.com/negokaz/dssh.sh/actions?query=workflow%3Atest)
 
 ssh client script for distributed systems
 
@@ -18,7 +18,7 @@ ssh client script for distributed systems
 Place `dssh.sh` to a directory which definition in `PATH` environment variable.
 
 ```
-curl -L https://raw.githubusercontent.com/negokaz/dssh.sh/master/dssh.sh \
+curl -L https://raw.githubusercontent.com/negokaz/dssh.sh/main/dssh.sh \
     -o /usr/local/bin/dssh.sh
 chmod +x /usr/local/bin/dssh.sh
 ```
